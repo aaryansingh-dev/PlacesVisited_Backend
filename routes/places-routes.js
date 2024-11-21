@@ -27,8 +27,8 @@ router.get('/:pid', (req, res, next) => {
     })
 
     if(!place){
-        // two ways
-        // next for async code
+        // two ways to throw errpr
+        // next() for async code
         // throw for sync code
         const error = new Error('Could not find a place with this id')
         error.code = 404;
