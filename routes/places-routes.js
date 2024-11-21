@@ -1,5 +1,6 @@
 const express = require('express');
 
+const HttpError = require('../models/http-error')
 const router = express.Router();
 // special object on which we can also register middlewares.
 // filtered by http method and path
@@ -30,9 +31,7 @@ router.get('/:pid', (req, res, next) => {
         // two ways to throw errpr
         // next() for async code
         // throw for sync code
-        const error = new Error('Could not find a place with this id')
-        error.code = 404;
-        throw error;
+        throw new HttpError('Could not find a place with this id', 404)
     }
     res.json({place: place});   
 });
@@ -43,8 +42,7 @@ router.get('/user/:uid',(req, res, next) => {
         return p.creator === userId
     })
     if(!place){
-        const error = new Error('Could not find a place for user with user id: ' + userId)
-        error.code = 404
+        const error = new HttpError('Could not find a place for user with user id: ' + userId, 404)
         next(error);
         return
     }
