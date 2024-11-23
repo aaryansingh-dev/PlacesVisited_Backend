@@ -18,6 +18,7 @@ const getAllUsers = (req, res, next) => {
     if(users.length === 0){
         const error = new HttpError('No users found', 404)
         next(error)
+        return
     }
 
     res.json({users})
@@ -38,6 +39,7 @@ const signup = (req, res, next) => {
     if(!user){
         const error = new HttpError('Could not create the user.', 404)
         next(error)
+        return
     }
     res.status(201).json({user})
 }
@@ -51,6 +53,7 @@ const login = (req, res, next) => {
     if(!user){
         const error = new HttpError('Wrong password and email combination', 404);
         next(error)
+        return
     }
 
     res.json({user})
@@ -58,3 +61,4 @@ const login = (req, res, next) => {
 
 exports.getAllUsers = getAllUsers
 exports.signup = signup
+exports.login = login
