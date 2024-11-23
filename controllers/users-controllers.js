@@ -47,16 +47,16 @@ const signup = (req, res, next) => {
 const login = (req, res, next) => {
     const {email, password} = req.body;
     const user = DUMMY_USERS.find(p => {
-        return (email === p.email && password === p.password)
+        return (email === p.email)
     })
 
-    if(!user){
-        const error = new HttpError('Wrong password and email combination', 404);
+    if(!user || password !== user.password){
+        const error = new HttpError('Wrong password and email combination', 401);
         next(error)
         return
     }
 
-    res.json({user})
+    res.json({message: 'Logged in'})
 }
 
 exports.getAllUsers = getAllUsers
