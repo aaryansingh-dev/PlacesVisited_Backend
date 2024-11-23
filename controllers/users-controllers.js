@@ -34,13 +34,13 @@ const signup = (req, res, next) => {
         password
     }
 
-    DUMMY_USERS.push(user)
-
-    if(!user){
-        const error = new HttpError('Could not create the user.', 404)
-        next(error)
+    if(DUMMY_USERS.find(u => u.email === email)){
+        const error = new HttpError('User already registered with this email id.', 422);
+        next(error);
         return
     }
+
+    DUMMY_USERS.push(user)
     res.status(201).json({user})
 }
 
