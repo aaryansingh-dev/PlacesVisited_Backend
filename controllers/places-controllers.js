@@ -1,7 +1,7 @@
 const HttpError = require('../models/http-error')
 const {v4: uuidv4} = require('uuid')
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
     {
         id: 'p1',
         title: 'Empire State Building',
