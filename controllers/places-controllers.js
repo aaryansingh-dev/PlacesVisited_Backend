@@ -3,6 +3,8 @@ const {v4: uuidv4} = require('uuid')
 const {validationResult} = require('express-validator')
 const getCoordsForAddress = require('../util/location');
 
+const Place = require('../models/place')
+
 
 let DUMMY_PLACES = [
     {
