@@ -3,6 +3,7 @@ const {v4: uuidv4} = require('uuid')
 const {validationResult} = require('express-validator')
 
 const User = require('../models/user');
+const { link } = require('../routes/places-routes');
 
 
 DUMMY_USERS = [
@@ -64,18 +65,24 @@ const signup = async (req, res, next) => {
     res.status(201).json({user: user.toObject({getters: true})});
 }
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
+    const errors = validationResult(req);
+
     if(!errors.isEmpty()){
         next(new HttpError('Invalid credentials', 404));
         return;
     }
 
     const {email, password} = req.body;
-    const user = DUMMY_USERS.find(p => {
-        return (email === p.email)
-    })
+    
+    let existingUser;
+    try{
+        existingUser = await User.findOne({email: email});
+    }catch(err){
+        return next(new HttpError('Could not find unique email - searching for unique email check.', 500));
+    }
 
-    if(!user || password !== user.password){
+    if(!existingUser || existingUser.password !== password){
         const error = new HttpError('Wrong password and email combination', 401);
         next(error)
         return
