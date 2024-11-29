@@ -39,11 +39,14 @@ const getPlaceById = async (req, res, next) => {
   res.json({place: place.toObject({getters: true})});   // getter: true will make sure that _id changes to id. .toObject removes _id, but getters: true will force it to keep the id as 'id'.
 };
 
-const getPlacesbyUserId = (req, res, next) => {
+const getPlacesbyUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((p) => {
-    return p.creator === userId;
-  });
+  let places;
+  try{
+    places = await Place.find({creator: userId});
+  }catch(err){
+    next(new HttpError('Something went wrong. Could not find the place.', 500))
+  }
 
   if (!places || places.length === 0) {
     const error = new HttpError(
@@ -53,7 +56,7 @@ const getPlacesbyUserId = (req, res, next) => {
     next(error);
     return;
   }
-  res.json({ places });
+  res.json({ places: places.map(p => p.toObject({getters: true})) });
 };
 
 const createPlace = async (req, res, next) => {
@@ -92,7 +95,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({place: createdPlace});
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
@@ -103,14 +106,23 @@ const updatePlace = (req, res, next) => {
   const pid = req.params.pid;
   const { title, description } = req.body;
 
-  const updatedPlace = { ...DUMMY_PLACES.find((p) => pid === p.id) };
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === pid);
-  updatedPlace.title = title;
-  updatedPlace.description = description;
+  let place;
+  try{
+    place = await Place.findById(pid);
+  }catch(err){
+    return next(new HttpError('Something went wrong updating the place', 500));
+  }
+  
+  place.title = title;
+  place.description = description;
 
-  DUMMY_PLACES[placeIndex] = updatedPlace;
-
-  res.status(200).json({ place: updatedPlace });
+  try{
+   await place.save();
+  }catch(err){
+    return next(new HttpError('Something went wrong. Could not update the place', 500));
+  }
+ 
+  res.status(200).json({ place: place.toObject({getters: true}) });
 };
 
 const deletePlace = (req, res, next) => {
