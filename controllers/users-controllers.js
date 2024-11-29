@@ -15,16 +15,17 @@ DUMMY_USERS = [
     }
 ]
 
-const getAllUsers = (req, res, next) => {
-    users = DUMMY_USERS
-
-    if(users.length === 0){
-        const error = new HttpError('No users found', 404)
-        next(error)
-        return
+const getAllUsers = async (req, res, next) => {
+    let users;
+    try{
+       users = await User.find({}, '-password');
+    }catch(err){
+        return next(new HttpError(
+            'Error fetching users', 500
+        ))
     }
 
-    res.json({users})
+    res.json({users: users.map(u => u.toObject({getters: true}))});
 }
 
 const signup = async (req, res, next) => {
