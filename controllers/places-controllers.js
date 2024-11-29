@@ -5,20 +5,6 @@ const getCoordsForAddress = require("../util/location");
 
 const Place = require("../models/place");
 
-let DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empire State Building",
-    description: "One of the tallest buildings in USA.",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "New York, NY 10001",
-    creator: "u1",
-  },
-];
-
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
 
@@ -125,15 +111,21 @@ const updatePlace = async (req, res, next) => {
   res.status(200).json({ place: place.toObject({getters: true}) });
 };
 
-const deletePlace = (req, res, next) => {
+const deletePlace = async (req, res, next) => {
   const pid = req.params.pid;
 
-  if (!DUMMY_PLACES.find((p) => p.id === pid)) {
-    next(new HttpError("Could not find a place with this id.", 404));
-    return;
+  let place;
+  try{
+    place = await Place.findById(pid);
+  }catch(err){
+    return next(new HttpError('Something went wrong deleting the place 1.', 500));
   }
 
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => pid !== p.id);
+  try{
+    await place.deleteOne()
+  }catch(err){
+    return next(new HttpError('Something went wrong deleting the place', 500));
+  }
 
   res.status(200).json({ message: "Deleted place" });
 };
