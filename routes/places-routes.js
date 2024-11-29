@@ -7,9 +7,9 @@ const router = express.Router();
 // filtered by http method and path
 // and we can export this Router
 
-router.get("/:pid", placesControllers.getPlaceById);
-
 router.get("/user/:uid", placesControllers.getPlacesbyUserId);
+
+router.get("/:pid", placesControllers.getPlaceById);
 
 router.post(
   "/",
