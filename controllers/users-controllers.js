@@ -26,7 +26,7 @@ const getAllUsers = (req, res, next) => {
     res.json({users})
 }
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
 
     const errors = validationResult(req);
     if(!errors.isEmpty()){
@@ -34,22 +34,34 @@ const signup = (req, res, next) => {
         return;
     }
 
-    const {name, email, password} = req.body
-    const user = {
-        id: uuidv4(),
+    const {name, email, password,} = req.body
+
+    let existingUser;
+    try{
+        existingUser = await User.findOne({email: email});
+    }catch(err){
+        return next(new HttpError('Could not find unique email - searching for unique email check.', 500));
+    }
+    
+    if(existingUser){
+        return next(new HttpError('User exists already. Please login instead', 422));
+    }
+
+    const user = new User({
         name,
         email,
-        password
+        image: "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?w=1400&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
+        password,
+        places: "p1"
+    })
+
+    try{
+        await user.save();
+    }catch(err){
+        return next(new HttpError('Signing up failed', 500));
     }
 
-    if(DUMMY_USERS.find(u => u.email === email)){
-        const error = new HttpError('User already registered with this email id.', 422);
-        next(error);
-        return
-    }
-
-    DUMMY_USERS.push(user)
-    res.status(201).json({user})
+    res.status(201).json({user: user.toObject({getters: true})});
 }
 
 const login = (req, res, next) => {
