@@ -11,6 +11,13 @@ const HttpError = require("./models/http-error");
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Allow-Control-Origin', '*');
+  res.setHeader('Access-Allow-Control-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Allow-Control-Methods', 'GET, POST, PATCH, DELETE');
+  
+})
+
 app.use("/api/places", placesRoutes); // => /api/places/...
 
 app.use("/api/users/", userRoutes); //=> /api/users/...
@@ -31,7 +38,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose.connect(
-  "mongodb+srv://aaryanjsingh:Il0veMongo@cluster0.dvhnk.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0"
+  "mongodb+srv://aaryanjsingh:Il0veMongo@cluster0.dvhnk.mongodb.net/mern?retryWrites=true&w=majority&appName=Cluster0"
 ).then(
     () => {
       console.log('Starting the server.')
