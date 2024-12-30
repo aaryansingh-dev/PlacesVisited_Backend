@@ -1,7 +1,7 @@
 const axios = require('axios')
 const HttpError = require('../models/http-error')
 
-const API_KEY = "AIzaSyCMg4UuKvW-P5zxHlc-KnJBCsLchVOAGLk";
+const API_KEY = "";
 
 async function getCoordsForAddress(address){
     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${API_KEY}`);
