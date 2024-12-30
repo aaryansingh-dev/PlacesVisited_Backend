@@ -3,6 +3,7 @@ const { check } = require("express-validator");
 
 const placesControllers = require("../controllers/places-controllers");
 const fileUpload = require("../middleware/file-upload");
+const checkAuth = require('../middleware/check-auth');
 const router = express.Router();
 // special object on which we can also register middlewares.
 // filtered by http method and path
@@ -11,6 +12,8 @@ const router = express.Router();
 router.get("/user/:uid", placesControllers.getPlacesbyUserId);
 
 router.get("/:pid", placesControllers.getPlaceById);
+
+router.use(checkAuth);
 
 router.post(
   "/",
