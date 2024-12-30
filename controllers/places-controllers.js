@@ -76,7 +76,7 @@ const createPlace = async (req, res, next) => {
     return;
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address} = req.body;
 
   let coordinates;
   try {
@@ -91,13 +91,13 @@ const createPlace = async (req, res, next) => {
     image: req.file.path,
     location: coordinates,
     address,
-    creator
+    creator: req.userData.userId
   });
 
   // check if the user exists
   let user;
   try{
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   }catch(err){
     return next(new HttpError('Createing place failed', 500))
   }
